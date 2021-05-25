@@ -113,6 +113,9 @@ struct active_partition_state {
   /// The number of events in the partition.
   size_t events;
 
+  /// Whether VAST is configured to use partition-local stores.
+  bool partition_local_stores;
+
   /// Actor handle of the filesystem actor.
   filesystem_actor filesystem;
 
@@ -182,6 +185,9 @@ struct passive_partition_state {
 
   /// The number of events in the partition.
   size_t events;
+
+  /// The store type as found in the flatbuffer.
+  active_partition_state::store_type store_type;
 
   /// The raw memory of the partition, used to spawn indexers on demand.
   chunk_ptr partition_chunk;

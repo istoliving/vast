@@ -11,6 +11,7 @@
 #include "vast/fwd.hpp"
 
 #include "vast/chunk.hpp"
+#include "vast/segment_builder.hpp"
 #include "vast/system/actors.hpp"
 
 #include <caf/typed_event_based_actor.hpp>
@@ -19,12 +20,26 @@ namespace vast::system {
 
 struct active_store_state {
   std::filesystem::path path;
-  std::unique_ptr<vast::segment_store> store;
+  std::unique_ptr<vast::segment_builder> builder;
 };
 
 struct passive_store_state {
-  chunk_ptr data;
+  /// Holds requests that were coming in while the data
+  /// was still being loaded from disk.
+  using request = std::tuple<vast::query, vast::ids,
+                             caf::typed_response_promise<atom::done>>;
+  std::vector<request> deferred_requests;
+
+  /// Typed view into the chunk below.
+  caf::optional<vast::segment> segment = {};
+  // const vast::segment* segment;
+
+  /// Raw chunk data.
+  // Todo: Combine this and the above as `flatbuffer_ptr<segment>`.
+  // chunk_ptr data;
 };
+
+std::filesystem::path store_path_for_partition(const vast::uuid&);
 
 store_builder_actor::behavior_type
 active_local_store(store_builder_actor::stateful_pointer<active_store_state>,
@@ -35,5 +50,8 @@ store_actor::behavior_type
 passive_local_store(store_actor::stateful_pointer<passive_store_state>,
                     filesystem_actor filesystem,
                     const std::filesystem::path& path);
+
+// Callback handler for the `store_factory`.
+store_actor local_store_load_handler(vast::span<uint8_t>);
 
 } // namespace vast::system

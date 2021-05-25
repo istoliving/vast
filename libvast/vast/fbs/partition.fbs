@@ -36,6 +36,13 @@ table v0 {
   ids: [ubyte];
 }
 
+/// The store header data for a partition_local_store.
+namespace vast.fbs.partition.store_header_local;
+
+table v0 {
+  path: string;
+}
+
 namespace vast.fbs.partition.store_header;
 
 /// Stores an id for the store implmentation and a block of bytes that
