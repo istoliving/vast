@@ -34,6 +34,7 @@
 #include "vast/format/zeek.hpp"
 #include "vast/logger.hpp"
 #include "vast/plugin.hpp"
+#include "vast/store_factory.hpp"
 #include "vast/system/accountant.hpp"
 #include "vast/system/node.hpp"
 #include "vast/system/posix_filesystem.hpp"
@@ -629,6 +630,12 @@ node(node_actor::stateful_pointer<node_state> self, std::string name,
                    msg.source);
       }
     });
+    // Set up the store factory.
+    // TODO: Eventually we want to do this by looping through all
+    // `store_plugin`s that are known to the server.
+    store_factory::register_("global", global_store_load_handler);
+    store_factory::register_("local", local_store_load_handler);
+    // Set up registry.
     auto& registry = self->state.registry;
     // Core components are terminated in a second stage, we remove them from the
     // registry upfront and deal with them later.

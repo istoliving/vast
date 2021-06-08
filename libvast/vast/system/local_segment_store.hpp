@@ -30,13 +30,8 @@ struct passive_store_state {
                              caf::typed_response_promise<atom::done>>;
   std::vector<request> deferred_requests;
 
-  /// Typed view into the chunk below.
+  /// The segment corresponding to this local store.
   caf::optional<vast::segment> segment = {};
-  // const vast::segment* segment;
-
-  /// Raw chunk data.
-  // Todo: Combine this and the above as `flatbuffer_ptr<segment>`.
-  // chunk_ptr data;
 };
 
 std::filesystem::path store_path_for_partition(const vast::uuid&);
@@ -50,8 +45,5 @@ store_actor::behavior_type
 passive_local_store(store_actor::stateful_pointer<passive_store_state>,
                     filesystem_actor filesystem,
                     const std::filesystem::path& path);
-
-// Callback handler for the `store_factory`.
-store_actor local_store_load_handler(vast::span<uint8_t>);
 
 } // namespace vast::system
